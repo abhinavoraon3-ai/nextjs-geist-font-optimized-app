@@ -1,0 +1,38 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Story {
+  id          String   @id @default(cuid())
+  title       String
+  originalText String
+  summary     String?
+  audioUrl    String?
+  videoUrl    String?
+  status      String   @default("pending") // pending, processing, completed, failed
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  scenes      Scene[]
+}
+
+model Scene {
+  id          String   @id @default(cuid())
+  storyId     String
+  sceneNumber Int
+  description String
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+
+  story       Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+  @@index([storyId])
+}
